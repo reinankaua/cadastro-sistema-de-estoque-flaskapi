@@ -4,9 +4,8 @@ from database.sessao import db
 from routes.cliente import register_routes_cliente
 from settings.config import Config
 
-from database.sessao import db
 from routes.produto import register_routes_produto
-from settings.config import Config
+
 
 
 def create_app():
