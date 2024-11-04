@@ -33,9 +33,9 @@ def register_routes_produto(app):
             return jsonify('erro': 'ero de integridade ao cadastrar produto'}) , 500
  
         novo_produto = Produto(
-            Nome=data.get('Nome'),
-            Código=data.get('Código'),
-            Categoria=data.get('Categoria'),
+            nome=data.get('Nome'),
+            codigo=data.get('Código'),
+            categoria=data.get('Categoria'),
         )
 
         db.session.add(novo_produto)
