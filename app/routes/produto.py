@@ -9,9 +9,9 @@ def register_routes_produto(app):
         data = request.get_json(force=True)
 
         novo_produto = Produto(
-            nome=data.get('nome'),
-            codigo=data.get('codigo'),
-            categoria=data.get('categoria'),
+            Nome=data.get('Nome'),
+            Código=data.get('Código'),
+            Categoria=data.get('Categoria'),
         )
 
         db.session.add(novo_produto)
@@ -24,10 +24,10 @@ def register_routes_produto(app):
         produtos = Produto.query.all()
 
         resultados = [{
-                'id': produto.id,
-                'nome': produto.nome,
-                'codigo': produto.codigo,
-                'categoria': produto.categoria,
+                'Id': produto.id,
+                'Nome': produto.nome,
+                'Código': produto.codigo,
+                'Categoria': produto.categoria,
             } for produto in produtos
         ]
 
@@ -38,10 +38,10 @@ def register_routes_produto(app):
         produto = Produto.query.get_or_404(id)
 
         resultado = {
-            'id': produto.id,
-            'nome': produto.nome,
-            'codigo': produto.codigo,
-            'categoria': produto.categoria,
+            'Id': produto.id,
+            'Nome': produto.nome,
+            'Código': produto.codigo,
+            'Categoria': produto.categoria,
         }
 
         return jsonify(resultado), 200
@@ -52,9 +52,9 @@ def register_routes_produto(app):
         data = request.get_json()
 
         produto = Produto.query.get_or_404(id)
-        produto.nome = data.get('nome', produto.nome)
-        produto.codigo = data.get('codigo', produto.codigo)
-        produto.categoria = data.get('categoria', produto.categoria)
+        produto.nome = data.get('Nome', produto.nome)
+        produto.codigo = data.get('Código', produto.codigo)
+        produto.categoria = data.get('Categoria', produto.categoria)
 
         db.session.add(produto)
         db.session.commit()
