@@ -1,27 +1,45 @@
 from flask import request, jsonify
-
 from database.sessao import db
 from model.cliente import Cliente
+from sqlalchemy.exc import IntegrityError
 
 
 def register_routes_cliente(app):
     @app.route('/cadastrar/cliente', methods=['POST'])
     def criar_cliente():
+
         data = request.get_json(force=True)
 
+        nome = data.get('Nome')
+        endereco = data.get('Endereço')
+        contato = data.get('Contato')
+
+        if not all([nome, endereco, contato]):
+            return jsonify({'erro': 'Nome, Endereço e Contato são obrigatórios'}), 400
+
+        cliente_existente = Cliente.query.filter_by(contato=contato).first()
+
+        if cliente_existente:
+            return jsonify({'erro': 'Contato já registrado para outro cliente'}), 409
+
         novo_cliente = Cliente(
-            nome=data.get('nome'),
-            endereco=data['endereco'],
-            contato=data.get('contato'),
+            nome=nome,
+            endereco=endereco,
+            contato=contato,
         )
 
-        db.session.add(novo_cliente)
-        db.session.commit()
+        try:
+            db.session.add(novo_cliente)
+            db.session.commit()
+            return jsonify({'mensagem': 'Novo cliente cadastrado'}), 200
 
-        return jsonify({'mensagem': 'Novo cliente cadastrado'}), 200
+        except IntegrityError:
+            db.session.rollback()
+            return jsonify({'erro': 'Erro de integridade ao cadastrar cliente'}), 500
 
     @app.route('/listar/cliente', methods=['GET'])
     def listar_cliente():
+
         clientes = Cliente.query.all()
 
         resultados = [{
@@ -36,6 +54,7 @@ def register_routes_cliente(app):
 
     @app.route('/listar/cliente/<int:id>', methods=['GET'])
     def listar_cliente_por_id(id):
+
         cliente = Cliente.query.get_or_404(id)
 
         resultado = {
@@ -47,18 +66,25 @@ def register_routes_cliente(app):
 
         return jsonify(resultado), 200
 
-
     @app.route('/atualizar/cliente/<int:id>', methods=['PUT'])
     def atualizar_cliente(id):
 
         data = request.get_json()
 
         cliente = Cliente.query.get_or_404(id)
-        cliente.nome = data.get('nome', cliente.nome)
-        cliente.endereco = data.get('endereco', cliente.endereco)
-        cliente.contato = data.get('contato', cliente.contato)
 
-        db.session.add(cliente)
+        novo_nome = data.get('Nome', cliente.nome)
+        novo_endereco = data.get('Endereço', cliente.endereco)
+        novo_contato = data.get('Contato', cliente.contato)
+
+        cliente_existente = Cliente.query.filter_by(contato=novo_contato).first()
+        if cliente_existente:
+            return jsonify({'erro': 'Contato já registrado para outro cliente'}), 409
+
+        cliente.nome = novo_nome
+        cliente.endereco = novo_endereco
+        cliente.contato = novo_contato
+
         db.session.commit()
 
-        return jsonify({"message": "Cliente atualizado com sucesso."}), 200
+        return jsonify({"mensagem": "Cliente atualizado com sucesso."}), 200
