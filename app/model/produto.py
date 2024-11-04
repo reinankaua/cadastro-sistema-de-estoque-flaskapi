@@ -5,5 +5,5 @@ class Produto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(), nullable=False)
     codigo = db.Column(db.String(), nullable=False)
-    categoria = db.Column(db.String(), nullable=False)
+    categoria = db.Column(db.String(), nullable=False, unique=True)
 
