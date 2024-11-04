@@ -13,7 +13,7 @@ def register_routes_produto(app):
          categoria=data.get('Categoria'),
 
          if not  all([nome, codigo, categoria]):
-             return jsonify({'erro': 'Nome, codigo e endereço são obrigatorios'}) . 400
+             return jsonify({'erro': 'Nome, codigo e categoria são obrigatorios'}) . 400
             produto_existente = Produto.query.filter_by(categoria=categoria).first()
 
         if Produto_existente:
