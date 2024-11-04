@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from database.sessao import db
 from model.cliente import Cliente
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def register_routes_cliente(app):
@@ -33,7 +33,7 @@ def register_routes_cliente(app):
             db.session.commit()
             return jsonify({'mensagem': 'Novo cliente cadastrado'}), 200
 
-        except IntegrityError:
+        except SQLAlchemyError:
             db.session.rollback()
             return jsonify({'erro': 'Erro de integridade ao cadastrar cliente'}), 500
 
@@ -68,7 +68,6 @@ def register_routes_cliente(app):
 
     @app.route('/atualizar/cliente/<int:id>', methods=['PUT'])
     def atualizar_cliente(id):
-
         data = request.get_json()
 
         cliente = Cliente.query.get_or_404(id)
@@ -78,13 +77,19 @@ def register_routes_cliente(app):
         novo_contato = data.get('Contato', cliente.contato)
 
         cliente_existente = Cliente.query.filter_by(contato=novo_contato).first()
-        if cliente_existente:
+
+        if cliente_existente and cliente_existente.id != cliente.id:
             return jsonify({'erro': 'Contato já registrado para outro cliente'}), 409
 
         cliente.nome = novo_nome
         cliente.endereco = novo_endereco
         cliente.contato = novo_contato
 
-        db.session.commit()
+        try:
+            db.session.commit()
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return jsonify({"erro": "Erro ao atualizar cliente"}), 500
 
         return jsonify({"mensagem": "Cliente atualizado com sucesso."}), 200
