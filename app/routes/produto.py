@@ -21,16 +21,16 @@ def register_routes_produto(app):
             novo_produto = Produto(
                 nome=nome,
                 codigo=codigo,
-                categpria=categoria,
+                categoria=categoria,
         )
         try:
             db.session.add(novo_produto)
             db.session.commit()
-            return jsonify('mensagem': 'Novo porduto cadastrado'}) , 200
+            return jsonify('mensagem': 'Novo produto cadastrado'}) , 200
 
         except Integrityerror:
             db.session.rollback()
-            return jsonify('erro': 'ero de integridade ao cadastrar produto'}) , 500
+            return jsonify('erro': 'Erro de integridade ao cadastrar produto'}) , 500
  
         novo_produto = Produto(
             nome=data.get('Nome'),
