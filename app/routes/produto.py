@@ -8,6 +8,30 @@ def register_routes_produto(app):
     def criar_produto():
         data = request.get_json(force=True)
 
+         Nome=data.get('Nome'),
+         Código=data.get('Código'),
+         Categoria=data.get('Categoria'),
+
+         if not  all([nome, codigo, categoria]):
+             return jsonify({'erro': 'Nome, codigo e endereço são obrigatorios'}) . 400
+             produto_existente = Produto.query.filter_by(categoria=categoria).first()
+
+        if Produto existente:
+             return jsonify('erro': 'endereço já registrado para outro produto'}) , 409
+            novo_produto = Produto(
+                nome=nome,
+                codigo=codigo,
+                categpria=categoria,
+        )
+        try:
+            db.session.add(novo_produto)
+            db.session.commit()
+            return jsonify('mensagem': 'Novo porduto cadastrado'}) , 200
+
+        except Integrityerror:
+            db.session.rollback()
+            return jsonify('erro': 'ero de integridade ao cadastrar produto'}) , 500
+ 
         novo_produto = Produto(
             Nome=data.get('Nome'),
             Código=data.get('Código'),
