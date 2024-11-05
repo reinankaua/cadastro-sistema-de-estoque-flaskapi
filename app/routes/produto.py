@@ -32,30 +32,6 @@ def register_routes_produto(app):
             db.session.rollback()
             return jsonify('erro': 'Erro de integridade ao cadastrar produto'}) , 500
  
-        novo_produto = Produto(
-            nome=data.get('Nome'),
-            codigo=data.get('Código'),
-            categoria=data.get('Categoria'),
-        )
-
-        db.session.add(novo_produto)
-        db.session.commit()
-
-        return jsonify({'mensagem': 'Novo produto cadastrado'}), 200
-
-    @app.route('/listar/produto', methods=['GET'])
-    def listar_produto():
-        produtos = Produto.query.all()
-
-        resultados = [{
-                'id': produto.id,
-                'nome': produto.nome,
-                'codigo': produto.codigo,
-                'categoria': produto.categoria,
-            } for produto in produtos
-        ]
-
-        return jsonify(resultados), 200
 
     @app.route('/listar/produto/<int:id>', methods=['GET'])
     def listar_produto_por_id(id):
