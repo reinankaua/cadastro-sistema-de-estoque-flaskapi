@@ -48,10 +48,10 @@ def register_routes_produto(app):
         produtos = Produto.query.all()
 
         resultados = [{
-                'Id': produto.id,
-                'Nome': produto.nome,
-                'Código': produto.codigo,
-                'Categoria': produto.categoria,
+                'id': produto.id,
+                'nome': produto.nome,
+                'codigo': produto.codigo,
+                'categoria': produto.categoria,
             } for produto in produtos
         ]
 
@@ -62,10 +62,10 @@ def register_routes_produto(app):
         produto = Produto.query.get_or_404(id)
 
         resultado = {
-            'Id': produto.id,
-            'Nome': produto.nome,
-            'Código': produto.codigo,
-            'Categoria': produto.categoria,
+            'id': produto.id,
+            'nome': produto.nome,
+            'codigo': produto.codigo,
+            'categoria': produto.categoria,
         }
 
         return jsonify(resultado), 200
