@@ -32,7 +32,22 @@ def register_routes_produto(app):
             db.session.rollback()
             return jsonify('erro': 'Erro de integridade ao cadastrar produto'}) , 500
 
-@app.route('/atualizar/cliente/<int:id>', methods=['PUT'])
+    
+    @app.route('/listar/produto/<int:id>', methods=['GET'])
+    def listar_produto_por_id(id):
+        produto = Produto.query.get_or_404(id)
+
+        resultado = {
+            'id': produto.id,
+            'nome': produto.nome,
+            'codigo': produto.codigo,
+            'categoria': produto.categoria,
+        }
+
+        return jsonify(resultado), 200
+
+
+   @app.route('/atualizar/cliente/<int:id>', methods=['PUT'])
 def atualizar_produto(id):
     data = Produto.get_json()
 
@@ -58,32 +73,3 @@ def atualizar_produto(id):
         return jsonify({"erro": "Erro ao atualizar produto}), 500
 
  return jsonify({"mensagem": "Produto atualizado com sucesso."}), 200
-    
-    @app.route('/listar/produto/<int:id>', methods=['GET'])
-    def listar_produto_por_id(id):
-        produto = Produto.query.get_or_404(id)
-
-        resultado = {
-            'id': produto.id,
-            'nome': produto.nome,
-            'codigo': produto.codigo,
-            'categoria': produto.categoria,
-        }
-
-        return jsonify(resultado), 200
-
-
-    @app.route('/atualizar/produto/<int:id>', methods=['PUT'])
-    def atualizar_produto(id):
-        data = request.get_json()
-
-        produto = Produto.query.get_or_404(id)
-        produto.nome = data.get('Nome', produto.nome)
-        produto.codigo = data.get('Código', produto.codigo)
-        produto.categoria = data.get('Categoria', produto.categoria)
-
-        db.session.add(produto)
-        db.session.commit()
-
-        return jsonify({"mensagem": "Produto atualizado com sucesso."}), 200
-
