@@ -57,7 +57,7 @@ def atualizar_produto(id):
         db.session.rollback()
         return jsonify({"erro": "Erro ao atualizar produto}), 500
 
- return jsonify({"mensagem": "Produto atuaalizado com sucesso."}), 200
+ return jsonify({"mensagem": "Produto atualizado com sucesso."}), 200
     
     @app.route('/listar/produto/<int:id>', methods=['GET'])
     def listar_produto_por_id(id):
