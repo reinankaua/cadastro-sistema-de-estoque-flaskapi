@@ -47,7 +47,7 @@ def register_routes_produto(app):
         return jsonify(resultado), 200
 
 
-   @app.route('/atualizar/cliente/<int:id>', methods=['PUT'])
+   @app.route('/atualizar/produto/<int:id>', methods=['PUT'])
 def atualizar_produto(id):
     data = Produto.get_json()
 
