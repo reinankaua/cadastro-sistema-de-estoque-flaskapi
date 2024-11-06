@@ -19,7 +19,7 @@ def register_routes_produto(app):
 
         produto_existente = Produto.query.filter_by(categoria=categoria).first()
 
-        if Produto_existente:
+        if produto_existente:
             return jsonify({'erro': 'endereço já registrado para outro produto'}), 409
             novo_produto = Produto(
             nome = nome,
