@@ -1,6 +1,4 @@
 from flask import request, jsonify
-
-from sqlalchemy.exc import IntegrityError
 from database.sessao import db
 from model.produto import Produto
 
@@ -9,10 +7,9 @@ def register_routes_produto(app):
     @app.route('/cadastrar/produto', methods=['POST'])
     def criar_produto():
         data = request.get_json(force=True)
-
-        nome = data.get('Nome')
-        codigo = data.get('Código')
-        categoria = data.get('Categoria')
+        nome = data.get('Nome'),
+        codigo = data.get('Código'),
+        categoria = data.get('Categoria'),
 
         if not all([nome, codigo, categoria]):
             return jsonify({'erro': 'Nome, codigo e categoria são obrigatorios'}), 400
@@ -21,21 +18,21 @@ def register_routes_produto(app):
 
         if produto_existente:
             return jsonify({'erro': 'endereço já registrado para outro produto'}), 409
-            novo_produto = Produto(
-            nome = nome,
-            codigo = codigo,
-            categoria = categoria,
-        )
         try:
+            novo_produto = Produto(
+                nome=nome,
+                codigo=codigo,
+                categoria=categoria,
+            )
             db.session.add(novo_produto)
             db.session.commit()
             return jsonify({'mensagem': 'Novo produto cadastrado'}), 200
 
-        except Integrityerror:
+        except Exception as err:
             db.session.rollback()
-            return jsonify({'erro': 'Erro de integridade ao cadastrar produto'}), 500
+            return jsonify({'erro': err}), 500
 
-    @app.route('/listar/produto/<int:id>',methods=['GET'])
+    @app.route('/listar/produto/<int:id>', methods=['GET'])
     def listar_produto_por_id(id):
         produto = Produto.query.get_or_404(id)
 
@@ -47,7 +44,6 @@ def register_routes_produto(app):
         }
 
         return jsonify(resultado), 200
-
 
     @app.route('/atualizar/produto/<int:id>', methods=['PUT'])
     def atualizar_produto(id):
@@ -61,9 +57,4 @@ def register_routes_produto(app):
         db.session.add(produto)
         db.session.commit()
 
-        try:
-            db.session.commit()
-            return jsonify({"mensagem": "Produto atualizado com sucesso."}), 200
-        except IntegrityError:
-            db.session.rollback()
-            return jsonify({'erro': 'Erro de integridade ao atualizar produto'}), 500
+        return jsonify({'mensagem': "Produto atualizado com sucesso."}), 200
