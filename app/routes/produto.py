@@ -7,9 +7,9 @@ def register_routes_produto(app):
     @app.route('/cadastrar/produto', methods=['POST'])
     def criar_produto():
         data = request.get_json(force=True)
-        nome = data.get('Nome'),
-        codigo = data.get('Código'),
-        categoria = data.get('Categoria'),
+        nome = data.get('Nome')
+        codigo = data.get('Código')
+        categoria = data.get('Categoria')
 
         if not all([nome, codigo, categoria]):
             return jsonify({'erro': 'Nome, codigo e categoria são obrigatorios'}), 400
