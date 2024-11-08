@@ -6,7 +6,9 @@ from model.produto import Produto
 def register_routes_produto(app):
     @app.route('/cadastrar/produto', methods=['POST'])
     def criar_produto():
+
         data = request.get_json(force=True)
+
         nome = data.get('Nome')
         codigo = data.get('Código')
         categoria = data.get('Categoria')
@@ -18,6 +20,7 @@ def register_routes_produto(app):
 
         if produto_existente:
             return jsonify({'erro': 'codigo já registrado para outro produto'}), 409
+
         try:
             novo_produto = Produto(
                 nome=nome,
@@ -46,7 +49,7 @@ def register_routes_produto(app):
         ]
 
         return jsonify(resultados), 200
-
+    
     @app.route('/listar/produto/<int:id>', methods=['GET'])
     def listar_produto_por_id(id):
         produto = Produto.query.get_or_404(id)
@@ -57,19 +60,3 @@ def register_routes_produto(app):
             'codigo': produto.codigo,
             'categoria': produto.categoria,
         }
-
-        return jsonify(resultado), 200
-
-    @app.route('/atualizar/produto/<int:id>', methods=['PUT'])
-    def atualizar_produto(id):
-        data = request.get_json()
-
-        produto = Produto.query.get_or_404(id)
-        produto.nome = data.get('Nome', produto.nome)
-        produto.codigo = data.get('Código', produto.codigo)
-        produto.categoria = data.get('Categoria', produto.categoria)
-
-        db.session.add(produto)
-        db.session.commit()
-
-        return jsonify({'mensagem': "Produto atualizado com sucesso."}), 200

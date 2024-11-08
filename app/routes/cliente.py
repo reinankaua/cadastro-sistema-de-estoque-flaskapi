@@ -92,3 +92,4 @@ def register_routes_cliente(app):
             return jsonify({"erro": "Erro ao atualizar cliente"}), 500
 
         return jsonify({"mensagem": "Cliente atualizado com sucesso."}), 200
+    

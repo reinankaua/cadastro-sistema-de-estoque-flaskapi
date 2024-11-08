@@ -1,34 +1,69 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from model.estoque import Estoque
-import pandas as pd
+from database.sessao import db
 
-app = Flask(__name__)
+def register_routes_estoque(app):
+    @app.route('/cadastrar/estoque', methods=['POST'])
+    def criar_estoque():
 
-# Carregar o CSV no DataFrame
-estoque_df = pd.read_csv("estoque.csv")
+        data = request.get_json(force=True)
+
+        id_cliente = data.get('ID_Cliente')
+        id_produto = data.get('ID_Produto')
+        quantidade = data.get('Quantidade')
+
+        if not all([id_cliente, id_produto, quantidade]):
+            return jsonify({'erro': 'id_cliente, id_produto e quantidade são obrigatorios'}), 400
+
+        try:
+            novo_produto = Estoque(
+                id_cliente=id_cliente,
+                id_produto=id_produto,
+                quantidade=quantidade,
+            )
+            db.session.add(novo_produto)
+            db.session.commit()
+            return jsonify({'mensagem': 'Novo registro no estoque cadastrado'}), 200
+
+        except Exception as err:
+            db.session.rollback()
+            return jsonify({'erro': err}), 500
 
 
-@app.route('/estoque/', methods=['GET'])
-def listar_estoque():
-    cliente = request.args.get('ID_Cliente')
-    produto = request.args.get('ID_Produto')
+    @app.route('/listar/estoque', methods=['GET'])
+    def listar_estoque():
+        lista_estoque = Estoque.query.all()
 
-    # Copia o DataFrame para aplicar filtros
-    filtro_df = estoque_df.copy()
+        resultados = [{
+            'id_cliente': estoque.id_cliente,
+            'id_produto': estoque.id_produto,
+            'quantidade': estoque.quantidade,
+            } for estoque in lista_estoque
+        ]
 
-    # Aplica o filtro por cliente
-    if cliente:
-        filtro_df = filtro_df[filtro_df['id_cliente'] == int(cliente)]
+        return jsonify(resultados), 200
+    @app.route('/listar/estoque/filtro', methods=['GET'])
+    def listar_estoque_com_filtros():
 
-    # Aplica o filtro por produto
-    if produto:
-        filtro_df = filtro_df[filtro_df['id_produto'] == int(produto)]
+        id_cliente = request.args.get('id_cliente')
+        id_produto = request.args.get('id_produto')
 
-    #Converter o DF filtrado em uma lista
-    resultado = filtro_df.to_dict(orient='records')
+        query = Estoque.query
 
-    return jsonify(resultado), 200
+        if id_cliente and id_produto:
+            query = query.filter_by(id_cliente=id_cliente, id_produto=id_produto)
+        elif id_cliente:
+            query = query.filter_by(id_cliente=id_cliente)
+        elif id_produto:
+            query = query.filter_by(id_produto=id_produto)
 
+        estoque_filtrado = query.all()
+        resultado = [
+            {
+                'id_cliente': estoque.id_cliente,
+                'id_produto': estoque.id_produto,
+                'quantidade': estoque.quantidade,
+            } for estoque in estoque_filtrado
+        ]
 
-if __name__ == '__main__':
-    app.run(debug=True)
+        return jsonify(resultado), 200
