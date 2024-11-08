@@ -22,20 +22,19 @@ def register_routes_cliente(app):
         if cliente_existente:
             return jsonify({'erro': 'Contato já registrado para outro cliente'}), 409
 
-        novo_cliente = Cliente(
-            nome=nome,
-            endereco=endereco,
-            contato=contato,
-        )
-
         try:
+            novo_cliente = Cliente(
+                nome=nome,
+                endereco=endereco,
+                contato=contato,
+            )
             db.session.add(novo_cliente)
             db.session.commit()
             return jsonify({'mensagem': 'Novo cliente cadastrado'}), 200
 
-        except SQLAlchemyError:
+        except Exception as err:
             db.session.rollback()
-            return jsonify({'erro': 'Erro de integridade ao cadastrar cliente'}), 500
+            return jsonify({'erro': err}), 500
 
     @app.route('/listar/cliente', methods=['GET'])
     def listar_cliente():

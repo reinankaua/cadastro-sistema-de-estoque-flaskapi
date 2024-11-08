@@ -14,10 +14,10 @@ def register_routes_produto(app):
         if not all([nome, codigo, categoria]):
             return jsonify({'erro': 'Nome, codigo e categoria são obrigatorios'}), 400
 
-        produto_existente = Produto.query.filter_by(categoria=categoria).first()
+        produto_existente = Produto.query.filter_by(codigo=codigo).first()
 
         if produto_existente:
-            return jsonify({'erro': 'endereço já registrado para outro produto'}), 409
+            return jsonify({'erro': 'codigo já registrado para outro produto'}), 409
         try:
             novo_produto = Produto(
                 nome=nome,
@@ -31,6 +31,21 @@ def register_routes_produto(app):
         except Exception as err:
             db.session.rollback()
             return jsonify({'erro': err}), 500
+
+    @app.route('/listar/produto', methods=['GET'])
+    def listar_produto():
+
+        produtos = Produto.query.all()
+
+        resultados = [{
+                'id': produto.id,
+                'nome': produto.nome,
+                'codigo': produto.codigo,
+                'categoria': produto.categoria,
+            } for produto in produtos
+        ]
+
+        return jsonify(resultados), 200
 
     @app.route('/listar/produto/<int:id>', methods=['GET'])
     def listar_produto_por_id(id):
